@@ -24,7 +24,13 @@ from .views.expiries import OverdueExpiriesView, UpcomingExpiriesView
 from .views.notifications import NotificationLogListView
 from .views.tasks import TaskListCreateView, TaskStatusUpdateView
 from .views.dashboard import DashboardSummaryView
-from .views.auth import CurrentUserView, LoginView, RefreshView
+from .views.auth import (
+    AcceptInviteView,
+    CurrentUserView,
+    LoginView,
+    RefreshView,
+    SetPasswordFromInviteView,
+)
 from .views.organizations import (
     OrganizationCreateView,
     OrganizationDetailView,
@@ -44,11 +50,42 @@ from .views.onboarding_templates import (
     OnboardingTemplateListCreateView,
     OnboardingTemplateRequirementListCreateView,
 )
-from .views.vendors import VendorContactListCreateView, VendorDetailView, VendorListCreateView
+from .views.vendors import (
+    VendorContactListCreateView,
+    VendorDetailView,
+    VendorListCreateView,
+    VendorStatusSummaryView,
+    VendorTimelineView,
+)
+from .views.platform_admin import (
+    PlatformAdminDashboardView,
+    PlatformAdminOrganizationCreateView,
+    PlatformAdminOrganizationDetailView,
+    PlatformAdminOrganizationListView,
+    PlatformAdminOrganizationStatusUpdateView,
+    PlatformAdminInviteOrgAdminView,
+)
+from .views.setup import (
+    SetupApprovalFlowView,
+    SetupCompleteView,
+    SetupDocumentTypesView,
+    SetupInviteMembersView,
+    SetupNotificationSettingsView,
+    SetupOnboardingTemplatesView,
+    SetupOrganizationProfileView,
+    SetupStatusView,
+    SetupVendorCategoriesView,
+)
 
 urlpatterns = [
     path('vendors/', VendorListCreateView.as_view(), name='vendor-list-create'),
     path('vendors/<uuid:vendor_id>/', VendorDetailView.as_view(), name='vendor-detail'),
+    path('vendors/<uuid:vendor_id>/timeline/', VendorTimelineView.as_view(), name='vendor-timeline'),
+    path(
+        'vendors/<uuid:vendor_id>/status-summary/',
+        VendorStatusSummaryView.as_view(),
+        name='vendor-status-summary',
+    ),
     path(
         'vendors/<uuid:vendor_id>/contacts/',
         VendorContactListCreateView.as_view(),
@@ -166,6 +203,8 @@ urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='auth-login'),
     path('auth/refresh/', RefreshView.as_view(), name='auth-refresh'),
     path('auth/me/', CurrentUserView.as_view(), name='auth-me'),
+    path('auth/accept-invite/', AcceptInviteView.as_view(), name='auth-accept-invite'),
+    path('auth/set-password-from-invite/', SetPasswordFromInviteView.as_view(), name='auth-set-password-from-invite'),
     path('organizations/', OrganizationCreateView.as_view(), name='organization-create'),
     path('organizations/detail/', OrganizationDetailView.as_view(), name='organization-detail'),
     path('organizations/members/', OrganizationMembersView.as_view(), name='organization-members'),
@@ -174,4 +213,35 @@ urlpatterns = [
         OrganizationMemberRoleUpdateView.as_view(),
         name='organization-member-role',
     ),
+    path('platform-admin/dashboard/', PlatformAdminDashboardView.as_view(), name='platform-dashboard'),
+    path('platform-admin/organizations/', PlatformAdminOrganizationListView.as_view(), name='platform-orgs'),
+    path(
+        'platform-admin/organizations/<uuid:org_id>/',
+        PlatformAdminOrganizationDetailView.as_view(),
+        name='platform-org-detail',
+    ),
+    path(
+        'platform-admin/organizations/<uuid:org_id>/status/',
+        PlatformAdminOrganizationStatusUpdateView.as_view(),
+        name='platform-org-status',
+    ),
+    path(
+        'platform-admin/organizations/create/',
+        PlatformAdminOrganizationCreateView.as_view(),
+        name='platform-org-create',
+    ),
+    path(
+        'platform-admin/organizations/<uuid:org_id>/invite-admin/',
+        PlatformAdminInviteOrgAdminView.as_view(),
+        name='platform-org-invite-admin',
+    ),
+    path('setup/status/', SetupStatusView.as_view(), name='setup-status'),
+    path('setup/organization-profile/', SetupOrganizationProfileView.as_view(), name='setup-org-profile'),
+    path('setup/invite-members/', SetupInviteMembersView.as_view(), name='setup-invite-members'),
+    path('setup/vendor-categories/', SetupVendorCategoriesView.as_view(), name='setup-vendor-categories'),
+    path('setup/document-types/', SetupDocumentTypesView.as_view(), name='setup-document-types'),
+    path('setup/onboarding-templates/', SetupOnboardingTemplatesView.as_view(), name='setup-templates'),
+    path('setup/approval-flow/', SetupApprovalFlowView.as_view(), name='setup-approval-flow'),
+    path('setup/notification-settings/', SetupNotificationSettingsView.as_view(), name='setup-notifications'),
+    path('setup/complete/', SetupCompleteView.as_view(), name='setup-complete'),
 ]

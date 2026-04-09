@@ -50,6 +50,17 @@ class OnboardingTemplateService:
             review_required=review_required,
         )
 
+    @staticmethod
+    def update_requirement(
+        *, requirement: OnboardingTemplateRequirement, template: OnboardingTemplate, **data
+    ) -> OnboardingTemplateRequirement:
+        if requirement.template_id != template.id:
+            raise ValueError('Requirement does not belong to template.')
+        for field, value in data.items():
+            setattr(requirement, field, value)
+        requirement.save(update_fields=list(data.keys()) + ['updated_at'])
+        return requirement
+
 
 class OnboardingService:
     @staticmethod

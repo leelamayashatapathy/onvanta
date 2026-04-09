@@ -1,11 +1,20 @@
 from __future__ import annotations
 
+from rest_framework.permissions import BasePermission
+
 from apps.common.permissions import HasOrganizationRole
 from apps.organizations.enums import OrganizationMemberRole
 
 
 class IsOrganizationMember(HasOrganizationRole):
     required_roles: set[str] = set()
+
+
+class IsPlatformAdmin(BasePermission):
+    message = 'Platform admin access required.'
+
+    def has_permission(self, request, view) -> bool:
+        return bool(request.user and request.user.is_authenticated and request.user.is_platform_admin)
 
 
 class CanManageVendors(HasOrganizationRole):

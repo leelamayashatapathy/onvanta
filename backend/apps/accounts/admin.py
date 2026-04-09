@@ -7,13 +7,22 @@ from .models import User
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
     ordering = ('email',)
-    list_display = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
+    list_display = ('email', 'first_name', 'last_name', 'is_active', 'is_staff', 'is_platform_admin')
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name')}),
         (
             'Permissions',
-            {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')},
+            {
+                'fields': (
+                    'is_active',
+                    'is_staff',
+                    'is_superuser',
+                    'is_platform_admin',
+                    'groups',
+                    'user_permissions',
+                )
+            },
         ),
         ('Important dates', {'fields': ('last_login',)}),
     )
@@ -22,7 +31,14 @@ class UserAdmin(DjangoUserAdmin):
             None,
             {
                 'classes': ('wide',),
-                'fields': ('email', 'password1', 'password2', 'is_staff', 'is_superuser'),
+                'fields': (
+                    'email',
+                    'password1',
+                    'password2',
+                    'is_staff',
+                    'is_superuser',
+                    'is_platform_admin',
+                ),
             },
         ),
     )

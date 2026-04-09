@@ -7,14 +7,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.api.mixins import OrganizationContextMixin
-from apps.api.permissions import CanManageOrgSettings, IsOrganizationMember
+from apps.api.permissions import CanManageOrgSettings, IsOrganizationMember, IsPlatformAdmin
 from apps.api.responses import success_response
 from apps.organizations.enums import OrganizationMemberRole, OrganizationMemberStatus
 from apps.organizations.models import Organization, OrganizationMember
 
 
 class OrganizationCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsPlatformAdmin]
 
     def post(self, request):
         name = request.data.get('name')

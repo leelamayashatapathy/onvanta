@@ -14,3 +14,17 @@ class OrganizationMemberStatus(models.TextChoices):
     INVITED = 'invited', 'Invited'
     ACTIVE = 'active', 'Active'
     INACTIVE = 'inactive', 'Inactive'
+
+
+class OrganizationStatus(models.TextChoices):
+    TRIAL = 'trial', 'Trial'
+    ACTIVE = 'active', 'Active'
+    SUSPENDED = 'suspended', 'Suspended'
+    ARCHIVED = 'archived', 'Archived'
+
+
+class OrganizationInviteStatus(models.TextChoices):
+    PENDING = 'pending', 'Pending'
+    ACCEPTED = 'accepted', 'Accepted'
+    EXPIRED = 'expired', 'Expired'
+    CANCELLED = 'cancelled', 'Cancelled'

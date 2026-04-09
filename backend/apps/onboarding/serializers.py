@@ -48,6 +48,13 @@ class OnboardingTemplateRequirementCreateSerializer(serializers.Serializer):
     review_required = serializers.BooleanField(default=True)
 
 
+class OnboardingTemplateRequirementUpdateSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    required = serializers.BooleanField(required=False)
+    sequence = serializers.IntegerField(min_value=0, required=False)
+    review_required = serializers.BooleanField(required=False)
+
+
 class OnboardingCaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnboardingCase

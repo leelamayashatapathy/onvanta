@@ -3,7 +3,12 @@ from django.db import models
 
 from apps.common.models import TimeStampedUUIDModel
 
-from .enums import OrganizationMemberRole, OrganizationMemberStatus
+from .enums import (
+    OrganizationInviteStatus,
+    OrganizationMemberRole,
+    OrganizationMemberStatus,
+    OrganizationStatus,
+)
 
 
 class Organization(TimeStampedUUIDModel):
@@ -12,12 +17,17 @@ class Organization(TimeStampedUUIDModel):
     industry = models.CharField(max_length=255, blank=True)
     size = models.CharField(max_length=100, blank=True)
     timezone = models.CharField(max_length=64, default='UTC')
+    status = models.CharField(
+        max_length=20, choices=OrganizationStatus.choices, default=OrganizationStatus.TRIAL
+    )
     settings_json = models.JSONField(default=dict, blank=True)
+    last_activity_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         indexes = [
             models.Index(fields=['slug']),
             models.Index(fields=['created_at']),
+            models.Index(fields=['status']),
         ]
 
     def __str__(self) -> str:
@@ -45,3 +55,52 @@ class OrganizationMember(TimeStampedUUIDModel):
 
     def __str__(self) -> str:
         return f'{self.organization} - {self.user.email}'
+
+
+class OrganizationInvite(TimeStampedUUIDModel):
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name='invites'
+    )
+    email = models.EmailField()
+    role = models.CharField(max_length=50, choices=OrganizationMemberRole.choices)
+    token = models.CharField(max_length=64, unique=True)
+    invited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='sent_invites'
+    )
+    expires_at = models.DateTimeField()
+    accepted_at = models.DateTimeField(blank=True, null=True)
+    status = models.CharField(
+        max_length=20, choices=OrganizationInviteStatus.choices, default=OrganizationInviteStatus.PENDING
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['organization', 'status']),
+            models.Index(fields=['email']),
+            models.Index(fields=['expires_at']),
+        ]
+
+    def __str__(self) -> str:
+        return f'{self.email} - {self.organization.name}'
+
+
+class OrganizationSetupProgress(TimeStampedUUIDModel):
+    organization = models.OneToOneField(
+        Organization, on_delete=models.CASCADE, related_name='setup_progress'
+    )
+    profile_completed = models.BooleanField(default=False)
+    members_invited = models.BooleanField(default=False)
+    vendor_categories_configured = models.BooleanField(default=False)
+    document_types_configured = models.BooleanField(default=False)
+    onboarding_templates_configured = models.BooleanField(default=False)
+    approval_flow_configured = models.BooleanField(default=False)
+    notifications_configured = models.BooleanField(default=False)
+    setup_completed = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['setup_completed']),
+        ]
+
+    def __str__(self) -> str:
+        return f'{self.organization.name} setup'

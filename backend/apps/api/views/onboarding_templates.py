@@ -16,6 +16,7 @@ from apps.onboarding.serializers import (
     OnboardingTemplateCreateUpdateSerializer,
     OnboardingTemplateRequirementCreateSerializer,
     OnboardingTemplateRequirementSerializer,
+    OnboardingTemplateRequirementUpdateSerializer,
     OnboardingTemplateSerializer,
 )
 
@@ -111,3 +112,20 @@ class OnboardingTemplateRequirementListCreateView(OrganizationContextMixin, APIV
             ),
             status=status.HTTP_201_CREATED,
         )
+
+    def patch(self, request, template_id):
+        template = get_template_detail(organization=request.organization, template_id=template_id)
+        updates = request.data.get('requirements', [])
+        updated = []
+        for item in updates:
+            serializer = OnboardingTemplateRequirementUpdateSerializer(data=item)
+            serializer.is_valid(raise_exception=True)
+            requirement = template.requirements.get(id=serializer.validated_data['id'])
+            payload = {k: v for k, v in serializer.validated_data.items() if k != 'id'}
+            requirement = OnboardingTemplateService.update_requirement(
+                requirement=requirement,
+                template=template,
+                **payload,
+            )
+            updated.append(OnboardingTemplateRequirementSerializer(requirement).data)
+        return Response(success_response('Template requirements updated.', updated), status=200)

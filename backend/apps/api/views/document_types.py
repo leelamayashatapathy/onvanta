@@ -77,3 +77,6 @@ class DocumentTypeDetailView(OrganizationContextMixin, APIView):
             success_response('Document type updated.', DocumentTypeSerializer(document_type).data),
             status=200,
         )
+
+    def patch(self, request, document_type_id):
+        return self.put(request, document_type_id)

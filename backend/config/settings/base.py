@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from datetime import timedelta
 from pathlib import Path
@@ -18,6 +18,8 @@ env = environ.Env(
     JWT_ACCESS_LIFETIME_MINUTES=(int, 15),
     JWT_REFRESH_LIFETIME_DAYS=(int, 7),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    CORS_ALLOW_ALL_ORIGINS=(bool, True),
+    CORS_ALLOWED_ORIGINS=(list, ['http://localhost:3000']),
 )
 
 ENV_FILE = BASE_DIR / '.env'
@@ -35,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'apps.common',
@@ -50,11 +53,14 @@ INSTALLED_APPS = [
     'apps.tasks',
     'apps.notifications',
     'apps.dashboard',
+    'apps.organization_setup',
+    'apps.platform_admin',
     'apps.api',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -125,6 +131,8 @@ SIMPLE_JWT = {
 }
 
 CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS')
+CORS_ALLOW_ALL_ORIGINS = env('CORS_ALLOW_ALL_ORIGINS')
+CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS')
 
 REDIS_URL = env('REDIS_URL')
 CELERY_BROKER_URL = REDIS_URL

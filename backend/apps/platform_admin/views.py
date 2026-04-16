@@ -29,19 +29,19 @@ class PlatformAdminOrganizationListView(APIView):
     permission_classes = [IsPlatformAdmin]
 
     def get(self, request):
-        orgs = list_organizations()
+        organizations = list_organizations()
         data = [
             {
-                'id': str(o.id),
-                'name': o.name,
-                'slug': o.slug,
-                'industry': o.industry,
-                'size': o.size,
-                'timezone': o.timezone,
-                'status': o.status,
-                'created_at': o.created_at,
+                'id': str(organization.id),
+                'name': organization.name,
+                'slug': organization.slug,
+                'industry': organization.industry,
+                'size': organization.size,
+                'timezone': organization.timezone,
+                'status': organization.status,
+                'created_at': organization.created_at,
             }
-            for o in orgs
+            for organization in organizations
         ]
         return Response(success_response('Organizations.', data), status=200)
 
@@ -50,17 +50,17 @@ class PlatformAdminOrganizationDetailView(APIView):
     permission_classes = [IsPlatformAdmin]
 
     def get(self, request, org_id):
-        org = get_organization_detail(organization_id=org_id)
+        organization = get_organization_detail(organization_id=org_id)
         data = {
-            'id': str(org.id),
-            'name': org.name,
-            'slug': org.slug,
-            'industry': org.industry,
-            'size': org.size,
-            'timezone': org.timezone,
-            'status': org.status,
-            'settings_json': org.settings_json,
-            'created_at': org.created_at,
+            'id': str(organization.id),
+            'name': organization.name,
+            'slug': organization.slug,
+            'industry': organization.industry,
+            'size': organization.size,
+            'timezone': organization.timezone,
+            'status': organization.status,
+            'settings_json': organization.settings_json,
+            'created_at': organization.created_at,
         }
         return Response(success_response('Organization detail.', data), status=200)
 
@@ -73,14 +73,14 @@ class PlatformAdminOrganizationCreateView(APIView):
         name = request.data.get('name')
         if not name:
             return Response(error_response('Name required.', 'missing_name'), status=status.HTTP_400_BAD_REQUEST)
-        org = OrganizationRegistrationService.create_organization(
+        organization = OrganizationRegistrationService.create_organization(
             name=name,
             industry=request.data.get('industry', ''),
             size=request.data.get('size', ''),
             timezone=request.data.get('timezone', 'UTC'),
         )
         return Response(
-            success_response('Organization created.', {'id': str(org.id), 'name': org.name}),
+            success_response('Organization created.', {'id': str(organization.id), 'name': organization.name}),
             status=status.HTTP_201_CREATED,
         )
 
@@ -92,9 +92,9 @@ class PlatformAdminInviteOrgAdminView(APIView):
         email = request.data.get('email')
         if not email:
             return Response(error_response('Email required.', 'missing_email'), status=status.HTTP_400_BAD_REQUEST)
-        org = get_organization_detail(organization_id=org_id)
+        organization = get_organization_detail(organization_id=org_id)
         data = PlatformAdminOrganizationService.invite_admin(
-            organization=org,
+            organization=organization,
             email=email,
             invited_by=request.user,
         )
@@ -108,6 +108,14 @@ class PlatformAdminOrganizationStatusUpdateView(APIView):
         status_value = request.data.get('status')
         if not status_value:
             return Response(error_response('Status required.', 'missing_status'), status=status.HTTP_400_BAD_REQUEST)
-        org = get_organization_detail(organization_id=org_id)
-        org = PlatformAdminOrganizationService.update_organization_status(organization=org, status=status_value)
-        return Response(success_response('Organization status updated.', {'id': str(org.id), 'status': org.status}))
+        organization = get_organization_detail(organization_id=org_id)
+        organization = PlatformAdminOrganizationService.update_organization_status(
+            organization=organization,
+            status=status_value,
+        )
+        return Response(
+            success_response(
+                'Organization status updated.',
+                {'id': str(organization.id), 'status': organization.status},
+            )
+        )

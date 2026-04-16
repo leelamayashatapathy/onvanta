@@ -82,7 +82,7 @@ class SetupDocumentTypesView(OrganizationContextMixin, APIView):
         created = OrganizationSetupService.save_document_types(
             organization=request.organization, document_types=document_types
         )
-        data = [{'id': str(dt.id), 'name': dt.name, 'code': dt.code} for dt in created]
+        data = [{'id': str(document_type.id), 'name': document_type.name, 'code': document_type.code} for document_type in created]
         return Response(success_response('Document types saved.', data), status=201)
 
 
